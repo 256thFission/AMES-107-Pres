@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block bodyclass %}results{% endblock %}
+{% block content %}
+{% if none %}
+<h1>No decision at this stage.</h1>
+{% elif awaiting %}
+<h1>Awaiting results&hellip;</h1>
+{% else %}
+<h1>{{ round.title }}</h1>
+{% for sec in sections %}
+<div class="doodle-border">
+<h2>{{ sec.name | upper }}{% if not sec.binding %}: ADVISORY{% endif %}</h2>
+<p class="qn">{{ sec.question }}</p>
+<div class="chart" id="chart-{{ sec.key }}"></div>
+<p class="opt">{% for row in sec.rows %}{{ row.letter }}: {{ row.text }}{{ " · " if not loop.last }}{% endfor %}</p>
+{% if sec.verdict.kind == "win" %}
+<h3>{{ sec.name | upper }} {{ "CHOSE" if sec.binding else "PREFERRED" }}: {{ sec.verdict.text }}</h3>
+{% elif sec.verdict.kind == "tie" %}
+<h3>{{ sec.name | upper }} TIE: {{ sec.verdict.text }}</h3>
+{% else %}
+<h3>{{ sec.name | upper }}: NO VOTES CAST</h3>
+{% endif %}
+{% if not sec.binding %}<p>NO STATE AUTHORITY</p>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='roughviz.umd.js') }}"></script>
+{% if charts %}
+<script id="chart-data" type="application/json">{{ charts | tojson }}</script>
+<script>
+try {
+  JSON.parse(document.getElementById('chart-data').textContent).forEach(function (c) {
+    try {
+      new roughViz.Bar({element: c.element, data: {labels: c.labels, values: c.values},
+        roughness: 2, color: c.color,
+        fillStyle: 'hachure', fillWeight: 1.5, strokeWidth: 1.5, font: 'Short Stack',
+        labelFontSize: '1.4rem', axisFontSize: '1.2rem', interactive: false,
+        margin: {top: 20, right: 20, bottom: 50, left: 60}});
+      var el = document.querySelector(c.element);
+      function tidy(el) {
+        el.querySelectorAll('g[class*="Axis"] .tick').forEach(function (tick) {
+          var g = tick.parentNode.getAttribute('class') || '';
+          var text = tick.querySelector('text');
+          if (!text) return;
+          if (!g.startsWith('xAxis')) {
+            if (!/^\d+$/.test(text.textContent)) tick.remove();
+          } else {
+            text.setAttribute('transform', 'rotate(0)');
+            text.style.textAnchor = 'middle';
+          }
+        });
+        el.querySelectorAll('[attrX]').forEach(function (bar) {
+          var i = c.labels.indexOf(bar.getAttribute('attrX'));
+          if (i < 0) return;
+          var col = c.colors[i % c.colors.length];
+          bar.querySelectorAll('path').forEach(function (p) {
+            p.setAttribute('fill', col); p.setAttribute('stroke', col);
+          });
+        });
+      }
+      tidy(el);
+      var obs = new MutationObserver(function (muts) {
+        var added = muts.some(function (m) {
+          return Array.prototype.some.call(m.addedNodes, function (n) {
+            return n.nodeType === 1 &&
+              (n.classList && n.classList.contains('tick') || n.querySelector && n.querySelector('.tick'));
+          });
+        });
+        if (!added) return;
+        obs.disconnect();
+        tidy(el);
+        obs.observe(el, {childList: true, subtree: true});
+      });
+      obs.observe(el, {childList: true, subtree: true});
+    } catch (e) {}
+  });
+} catch (e) {}
+</script>
+{% endif %}
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}

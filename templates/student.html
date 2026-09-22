@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block bodyclass %}student-timeline{% endblock %}
+{% block content %}
+<div class="timeline-scroll">
+<div class="pid">#{{ pid }}</div>
+<h1>{{ ident.icon }} {{ ident.identity | upper }}</h1>
+<p class="role">{{ ident.role }}</p>
+
+<ol class="doodle-border timeline">
+{% for t in timeline %}
+{% if t.state != 'future' %}
+<li class="timeline-item {{ t.state }}">
+<span class="timeline-dot"></span>
+<span class="timeline-year">{{ t.year }}</span>
+<span class="timeline-title">{{ t.title }}</span>
+</li>
+{% endif %}
+{% endfor %}
+<li class="timeline-item unknown">
+<span class="timeline-dot"></span>
+<span class="timeline-title">the future is unwritten&hellip;</span>
+</li>
+</ol>
+
+<div class="doodle-border briefing">
+<ul>
+{% for line in ident.briefing %}<li>{{ line }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<form method="post" action="{{ url_for('logout') }}" class="logout">
+<button type="submit" class="link">not you?</button>
+</form>
+</div>
+
+<div class="doodle-border decision">
+{% with msgs = get_flashed_messages() %}
+{% if msgs %}{% for m in msgs %}<p class="error">{{ m }}</p>{% endfor %}{% endif %}
+{% endwith %}
+
+{% if not round %}
+<p>No decision is being made right now.</p>
+{% elif not my_options %}
+<h2>{{ faction_label | upper }} HAS NO DECISION THIS ROUND.</h2>
+<p>Read your briefing. Watch what the others choose.</p>
+{% elif decider %}
+<h2>{{ decider }} DECIDES FOR {{ faction_label | upper }}.</h2>
+<p>You do not have a vote.</p>
+<h3>{{ my_question }}</h3>
+<p class="opt">{% for letter, text in my_options.items() %}{{ letter }}: {{ text }}{{ " · " if not loop.last }}{% endfor %}</p>
+{% elif my_vote %}
+<p>You chose {{ my_vote }}: {{ my_options[my_vote] }}.</p>
+<p>Every group is deciding at the same time. Wait for the reveal.</p>
+{% elif not voting_open %}
+<p>{{ 'Voting has closed.' if results_visible else 'Voting is not open yet.' }}</p>
+<h3>{{ my_question }}</h3>
+{% else %}
+{% if advisory %}
+<h2>YOUR GROUP MAY EXPRESS A PREFERENCE.</h2>
+<p>Your vote will be shown to the class.</p>
+<p>It does not determine state policy.</p>
+{% else %}
+<h2>YOUR GROUP DECIDES.</h2>
+<p>Every group is deciding at the same time, and no one can see the others.</p>
+{% endif %}
+<h3>{{ my_question }}</h3>
+<form method="post" action="{{ url_for('vote') }}">
+{% for letter, text in my_options.items() %}
+<label><input type="radio" name="option" value="{{ letter }}" required> {{ letter }}: {{ text }}</label><br>
+{% endfor %}
+<button type="submit">SUBMIT</button>
+</form>
+{% endif %}
+</div>
+
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}

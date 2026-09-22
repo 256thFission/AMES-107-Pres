@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>EAST ASIA SIMULATION</h1>
+<div class="doodle-border">
+<p>Enter your participant number:</p>
+<form method="post">
+<input type="number" name="participant_id" min="1" max="99" required autofocus>
+<button type="submit">JOIN</button>
+</form>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+</div>
+{% endblock %}

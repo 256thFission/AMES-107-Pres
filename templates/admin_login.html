@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>ADMIN</h1>
+<div class="doodle-border">
+<form method="post">
+<input type="password" name="password" required autofocus placeholder="password">
+<button type="submit">LOGIN</button>
+</form>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+</div>
+{% endblock %}

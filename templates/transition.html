@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="pid">#{{ pid }}</div>
+<div class="doodle-border">
+<h1>{{ transition.title }}</h1>
+{% for line in transition.lines %}<p>{{ line }}</p>{% endfor %}
+{% if prev %}<p>Previous role: {{ prev.identity }}, {{ prev.role }}</p>{% endif %}
+<p>New role: {{ new.identity }}, {{ new.role }}</p>
+<form method="post" action="{{ url_for('acknowledge') }}">
+<input type="hidden" name="transition_id" value="{{ transition.id }}">
+<button type="submit">CONTINUE</button>
+</form>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}

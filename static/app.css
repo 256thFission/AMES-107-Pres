@@ -1,0 +1,65 @@
+body { font-family: 'Short Stack', cursive, sans-serif; }
+main { max-width: 640px; margin: 2em auto; padding: 0 1em; }
+h1, h2, h3 { text-transform: uppercase; }
+.pid { font-size: 3em; text-align: center; }
+.doodle-border { padding: 0.5em 1em; margin: 1em 0; }
+.chart { width: 100%; height: 320px; margin: 0 auto; }
+.chart svg { width: 100%; height: 100%; display: block; }
+.opt { margin-bottom: 0; }
+.error { color: #a00; }
+form.inline { display: inline; }
+.logout { text-align: center; margin-top: 2em; }
+button.link { background: none; border: none; text-decoration: underline; cursor: pointer; }
+table#counts td { padding: 0.2em 1em 0.2em 0; }
+body.results main { max-width: 900px; }
+body.results h1, body.results h2 { font-size: 2em; }
+
+/* vertical timeline with a sticky vote box */
+body.student-timeline .timeline-scroll { padding-bottom: 9em; }
+
+.timeline {
+  list-style: none; margin: 1.5em 0; padding: 1em 1em 1em 2.75em;
+  position: relative;
+}
+.timeline::before {
+  content: "";
+  position: absolute; left: 1.3em; top: 0.3em; bottom: 0.3em; width: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='60' viewBox='0 0 10 60'%3E%3Cpath d='M5 0 C3 12 7 18 5 30 C3 42 7 48 5 60' fill='none' stroke='%23ddd3c4' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+}
+.timeline-item {
+  position: relative; padding: 0.55em 0 0.55em 1em; color: #b0a798;
+  line-height: 1.3;
+}
+.timeline-dot {
+  position: absolute; left: -1.65em; top: 0.65em; width: 0.8em; height: 0.8em;
+  border-radius: 50%; border: 2px solid #ddd3c4; background: #FDF7F1;
+}
+.timeline-year { font-weight: bold; margin-right: 0.5em; }
+.timeline-item.past { color: #8a8378; }
+.timeline-item.past .timeline-dot { border-color: #b3a893; background: #b3a893; }
+.timeline-item.current {
+  color: #3c3c3c; font-size: 1.15em; font-weight: bold;
+  transform: rotate(-0.6deg);
+}
+.timeline-item.current .timeline-dot {
+  left: -1.75em; top: 0.55em; width: 1em; height: 1em;
+  border-color: #3c3c3c; border-width: 2px; background: #3c3c3c;
+  box-shadow: 0 0 0 4px #FDF7F1, 0 0 0 6px #3c3c3c;
+  animation: timeline-pulse 2s ease-in-out infinite;
+}
+.timeline-item.unknown { color: #cfc7ba; font-style: italic; }
+.timeline-item.unknown .timeline-dot { border-style: dashed; }
+
+@keyframes timeline-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px #FDF7F1, 0 0 0 6px #3c3c3c; }
+  50% { box-shadow: 0 0 0 6px #FDF7F1, 0 0 0 7px #3c3c3c; }
+}
+
+body.student-timeline .decision {
+  position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto;
+  max-width: 640px; width: calc(100% - 2em); box-sizing: border-box;
+  background: #FDF7F1; z-index: 10;
+  transform: rotate(-0.3deg);
+}
+.qn { font-style: italic; margin-bottom: .4rem; }

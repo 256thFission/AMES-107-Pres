@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>ADMIN</h1>
+<div class="doodle-border">
+<p>Stage {{ stage + 1 }} / {{ total }}, {{ year }}, {{ stage_title }}</p>
+<p>Round: {% if round %}{{ round.title }}{% else %}none{% endif %}</p>
+<p>Voting: <span id="voting-state">{{ 'OPEN' if voting_open else 'CLOSED' }}</span> | Results: <span id="results-state">{{ 'REVEALED' if results_visible else 'HIDDEN' }}</span></p>
+<table id="counts">
+{% for row in rows %}
+<tr><td>{{ row.faction }}{% if row.advisory %} (advisory){% endif %}</td>
+<td data-key="{{ row.key }}">{{ row.submitted }} / {{ row.eligible }}</td>
+<td><form method="post" action="{{ url_for('admin_reveal') }}" class="inline">
+<input type="hidden" name="faction" value="{{ row.key }}">
+<button {% if row.revealed %}disabled{% endif %}>REVEAL {{ row.faction | upper }}</button>
+</form></td></tr>
+{% endfor %}
+</table>
+<form method="post" action="{{ url_for('admin_open') }}" class="inline"><button {% if not round %}disabled{% endif %}>OPEN VOTING</button></form>
+<form method="post" action="{{ url_for('admin_close') }}" class="inline"><button {% if not round %}disabled{% endif %}>CLOSE VOTING</button></form>
+<form method="post" action="{{ url_for('admin_reveal_all') }}" class="inline"><button {% if not round %}disabled{% endif %}>REVEAL ALL</button></form>
+<form method="post" action="{{ url_for('admin_hide') }}" class="inline"><button {% if not round %}disabled{% endif %}>HIDE ALL</button></form>
+</div>
+<div class="doodle-border">
+<form method="post" action="{{ url_for('admin_previous') }}" class="inline"><button>&larr; PREVIOUS</button></form>
+<form method="post" action="{{ url_for('admin_next') }}" class="inline"><button>NEXT &rarr;</button></form>
+<p><a href="{{ url_for('results') }}" target="_blank">Projector results</a></p>
+</div>
+<div class="doodle-border">
+<h3>ARCHIVE</h3>
+<ul>
+{% for a in archive %}
+<li>{{ a.title }} [<a href="{{ url_for('results_archive', round_id=a.id) }}">VIEW</a>]</li>
+{% endfor %}
+</ul>
+</div>
+<form method="post" action="{{ url_for('admin_reset') }}" onsubmit="return confirm('Reset all votes and progress?')">
+<button>RESET PRESENTATION</button>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+setInterval(function () {
+  fetch('/admin/counts').then(function (r) { return r.json(); }).then(function (d) {
+    d.rows.forEach(function (row) {
+      var cell = document.querySelector('#counts td[data-key="' + row.key + '"]');
+      if (cell) cell.textContent = row.submitted + ' / ' + row.eligible;
+      var btn = document.querySelector('#counts tr td[data-key="' + row.key + '"] ~ td button');
+      if (btn) btn.disabled = row.revealed;
+    });
+    document.getElementById('voting-state').textContent = d.voting_open ? 'OPEN' : 'CLOSED';
+    document.getElementById('results-state').textContent = d.results_visible ? 'REVEALED' : 'HIDDEN';
+  }).catch(function () {});
+}, 2000);
+</script>
+{% endblock %}

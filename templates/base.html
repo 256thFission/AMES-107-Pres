@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}East Asia Simulation{% endblock %}</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Short+Stack&display=swap');</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='doodle.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body class="doodle {% block bodyclass %}{% endblock %}"
+      data-stage="{{ stage | default(0) }}"
+      data-voting-open="{{ '1' if voting_open else '0' }}"
+      data-results-visible="{{ '1' if results_visible else '0' }}"
+      data-revealed="{{ revealed_key | default('') }}">
+<main>
+{% block content %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
+</body>
+</html>
