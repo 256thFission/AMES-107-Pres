@@ -45,6 +45,8 @@ ADMIN_PASSWORD="${1:-$(.venv/bin/python -c 'import secrets; print(secrets.token_
 export ADMIN_PASSWORD
 export SECRET_KEY="$(.venv/bin/python -c 'import secrets; print(secrets.token_hex(32))')"
 
+COUNT="$(.venv/bin/python -c 'import config; print(max(config.PARTICIPANTS))')"
+
 # The address students type into their phones. Falls back to localhost.
 LAN_IP="$(.venv/bin/python - <<'PY'
 import socket
@@ -63,7 +65,7 @@ cat <<EOF
 
   EAST ASIA SIMULATION
 
-  Students     http://$LAN_IP:$PORT/login        (same wifi, numbers 1-24)
+  Students     http://$LAN_IP:$PORT/login        (same wifi, numbers 1-$COUNT)
   Projector    http://localhost:$PORT/results
   You          http://localhost:$PORT/admin      password: $ADMIN_PASSWORD
 

@@ -29,30 +29,25 @@ STAGE_INDEX = {name: i for i, name in enumerate(STAGES)}
 FACTION_ORDER = ["china", "taiwan", "japan", "korea", "russia", "west"]
 
 PARTICIPANTS = {
+    # The Qing world, seated together at the start.
     1: {"group": "china", "region": "mainland", "special": "emperor"},
     2: {"group": "china", "region": "mainland"},
     3: {"group": "china", "region": "mainland"},
     4: {"group": "china", "region": "mainland"},
-    5: {"group": "china", "region": "mainland"},
-    6: {"group": "china", "region": "mainland"},
-    7: {"group": "china", "region": "taiwan"},
-    8: {"group": "china", "region": "taiwan"},
-    9: {"group": "china", "region": "taiwan"},
+    # Taiwanese. Part of the China bloc until Shimonoseki, then their own.
+    5: {"group": "china", "region": "taiwan"},
+    6: {"group": "china", "region": "taiwan"},
+    # Koreans. Their own court from the start, but seated with China
+    # until independence in 1895.
+    7: {"group": "korea"},
+    8: {"group": "korea"},
+    9: {"group": "japan"},
     10: {"group": "japan"},
     11: {"group": "japan"},
-    12: {"group": "japan"},
-    13: {"group": "japan"},
-    14: {"group": "japan"},
-    15: {"group": "korea"},
-    16: {"group": "korea"},
-    17: {"group": "korea"},
-    18: {"group": "russia", "special": "tsar"},
-    19: {"group": "russia"},
-    20: {"group": "russia"},
-    21: {"group": "russia"},
-    22: {"group": "west"},
-    23: {"group": "west"},
-    24: {"group": "west"},
+    12: {"group": "russia", "special": "tsar"},
+    13: {"group": "russia"},
+    14: {"group": "west"},
+    15: {"group": "west"},
 }
 
 FACTION_COLORS = {

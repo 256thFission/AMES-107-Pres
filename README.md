@@ -21,7 +21,8 @@ ADMIN_PASSWORD=x .venv/bin/flask --app app run
 
 URLs:
 
-- `/login`: students enter their participant number (1-24)
+- `/login`: students enter their participant number, 1 to however
+  many rows `PARTICIPANTS` has in `config.py`
 - `/admin`: presenter controls (password from `ADMIN_PASSWORD`)
 - `/results`: projector view of the current decision, drawn as sketchy
   bar charts with roughViz.js (vendored in `static/`, no CDN)
