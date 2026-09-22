@@ -39,5 +39,6 @@ All historical content lives in `config.py`:
 - `TRANSITIONS`: identity-change notices shown to affected students
 - `BRIEFINGS`: private per-faction briefings for every stage
 
-in `app.py`'s `resolve_identity`, so advancing the stage automatically
-changes roles, icons and voting rights.
+Identities are computed from `(participant, stage)` by `resolve_identity`
+in `app.py`, never stored, so advancing the stage automatically changes
+roles, icons and voting rights.

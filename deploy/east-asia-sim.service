@@ -5,11 +5,11 @@ After=network.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/AMES-sino
-EnvironmentFile=/home/ubuntu/AMES-sino/.env
+WorkingDirectory=/home/ubuntu/AMES-107-Pres
+EnvironmentFile=/home/ubuntu/AMES-107-Pres/.env
 # -w 1 is mandatory: all app state lives in a single in-memory dict;
 # more workers would split the game across processes.
-ExecStart=/home/ubuntu/AMES-sino/.venv/bin/gunicorn -w 1 --threads 4 -b 127.0.0.1:8000 app:app
+ExecStart=/home/ubuntu/AMES-107-Pres/.venv/bin/gunicorn -w 1 --threads 4 -b 127.0.0.1:8000 app:app
 Restart=always
 
 [Install]
