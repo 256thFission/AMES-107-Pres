@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ames-107-pres
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # -w 1 is mandatory. The whole game lives in one in-memory dict, so a
+    # second worker would give half the class a different simulation.
+    startCommand: gunicorn -w 1 --threads 8 -b 0.0.0.0:$PORT app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false

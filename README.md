@@ -51,6 +51,33 @@ Identities are never mutated; they are computed from `(participant, stage)`
 in `app.py`'s `resolve_identity`, so advancing the stage automatically
 changes roles, icons and voting rights.
 
+## Putting it on the internet
+
+### Render, free, no card
+
+1. Sign in at [render.com](https://render.com) with GitHub.
+2. New, then Blueprint, and pick this repository. It reads `render.yaml`.
+3. It asks for `ADMIN_PASSWORD`. Choose one. `SECRET_KEY` is generated.
+4. Apply. You get a `something.onrender.com` URL in a few minutes.
+
+Free instances sleep after 15 minutes without traffic and take about a minute
+to wake, so open the page before class starts. They do not sleep mid-session:
+every student's browser polls every 2.5 seconds.
+
+### From your own laptop, no account at all
+
+If everyone is in the room, `./start.sh` already prints a LAN address they can
+use. When the wifi blocks device-to-device traffic, which campus networks often
+do, put a tunnel in front of it:
+
+```
+brew install cloudflared
+cloudflared tunnel --url http://localhost:5001
+```
+
+That prints a public `trycloudflare.com` URL that lasts as long as the command
+runs. Match the port to the one `start.sh` chose.
+
 ## Deploying to EC2 (Ubuntu)
 
 ```
