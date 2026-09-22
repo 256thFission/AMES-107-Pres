@@ -7,7 +7,18 @@ same time, each on its own question, and none of them can see the others. Some
 groups hold real state power; others may only advise. A projector page reveals
 the results one country at a time.
 
-## Run locally
+## Run it
+
+```
+./start.sh
+```
+
+That builds the virtualenv on first run, picks a free port (macOS keeps port
+5000 for AirPlay), prints an admin password, and tells you the address students
+type into their phones. Everyone needs to be on the same wifi. Pass your own
+password as `./start.sh mypassword` if you would rather choose it.
+
+Manually, if you prefer:
 
 ```
 python -m venv .venv
