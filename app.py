@@ -7,7 +7,7 @@ from functools import wraps
 from flask import (Flask, abort, flash, jsonify, redirect, render_template,
                    request, session, url_for)
 
-from config import (BRIEFINGS, FACTION_COLORS, FACTION_ORDER, PARTICIPANTS,
+from config import (BRIEFINGS, FACTION_COLORS, FACTION_ORDER, HISTORY, PARTICIPANTS,
                     ROUNDS, STAGE_INDEX, STAGE_LABELS, STAGES, TRANSITIONS)
 
 app = Flask(__name__)
@@ -26,7 +26,8 @@ def inject_revealed():
 
 
 FACTION_NAMES = {"china": "China", "taiwan": "Taiwan", "japan": "Japan",
-                 "korea": "Korea", "russia": "Russia", "west": "The West"}
+                 "korea": "Korea", "russia": "Russia", "britain": "Britain",
+                 "usa": "United States"}
 
 
 def resolve_identity(p, s):
@@ -40,12 +41,16 @@ def resolve_identity(p, s):
                        role="Emperor" if p.get("special") == "emperor" else "Peasant",
                        voting_mode="binding" if p.get("special") == "emperor" else "none")
         else:
-            out.update(identity="Republic of China", role="Nationalist",
-                       icon="🇨🇳", voting_mode="binding", faction="china")
+            out.update(identity="Republic of China", icon="🇨🇳",
+                       role="Nationalist" if s >= STAGE_INDEX["interwar"] else "Citizen",
+                       voting_mode="binding", faction="china")
     elif group == "china" and p.get("region") == "taiwan":
         if s < STAGE_INDEX["shimonoseki"]:
             out.update(identity="Qing China", role="Peasant", icon="🐉",
                        voting_mode="none", faction="china")
+        elif s == STAGE_INDEX["shimonoseki"]:
+            out.update(identity="Qing Taiwan", role="Islander", icon="🏝️",
+                       voting_mode="advisory", faction="taiwan")
         else:
             out.update(identity="Taiwan under Japanese rule",
                        role="Taiwanese subject", icon="🏝️",
@@ -58,8 +63,11 @@ def resolve_identity(p, s):
             out.update(identity="Joseon Korea (Qing tributary)",
                        role="Court official", icon="🏯", voting_mode="none",
                        faction="korea")
-        elif s < STAGE_INDEX["korea_japanese_rule"]:
+        elif s < STAGE_INDEX["russo_japanese_war"]:
             out.update(identity="Independent Korea", role="Government",
+                       icon="🇰🇷", voting_mode="binding", faction="korea")
+        elif s < STAGE_INDEX["qing_collapse"]:
+            out.update(identity="Korean Empire", role="Government",
                        icon="🇰🇷", voting_mode="binding", faction="korea")
         else:
             out.update(identity="Korea under Japanese rule",
@@ -70,19 +78,30 @@ def resolve_identity(p, s):
             out.update(identity="Russian Empire", icon="🇷🇺", faction="russia",
                        role="Tsar" if p.get("special") == "tsar" else "Peasant",
                        voting_mode="binding" if p.get("special") == "tsar" else "none")
-        else:
+        elif s == STAGE_INDEX["russian_collapse"]:
+            out.update(identity="Revolutionary Russia", role="Revolutionary",
+                       icon="🇷🇺", voting_mode="binding", faction="russia")
+        elif s < STAGE_INDEX["interwar"]:
             out.update(identity="Soviet Russia", role="Revolutionary", icon="☭",
                        voting_mode="binding", faction="russia")
-    elif group == "west":
-        out.update(identity="Western Powers", role="Diplomat", icon="🌐",
-                   voting_mode="binding", faction="west")
+        else:
+            out.update(identity="Soviet Union", role="Party official", icon="☭",
+                       voting_mode="binding", faction="russia")
+    elif group == "britain":
+        out.update(identity="British Empire", role="Foreign Office", icon="🇬🇧",
+                   voting_mode="binding", faction="britain")
+    elif group == "usa":
+        out.update(identity="United States", role="State Department", icon="🇺🇸",
+                   voting_mode="binding", faction="usa")
     out["briefing"] = BRIEFINGS.get(stage, {}).get(out["faction"], [])
     return out
 
 
 def faction_display(faction, stage_idx):
-    if faction == "russia" and stage_idx >= STAGE_INDEX["russian_collapse"]:
+    if faction == "russia" and stage_idx >= STAGE_INDEX["interwar"]:
         return "USSR"
+    if faction == "russia" and stage_idx >= STAGE_INDEX["siberian_intervention"]:
+        return "Soviet Russia"
     return FACTION_NAMES.get(faction, faction.title())
 
 
@@ -325,6 +344,33 @@ def admin():
                            stage_title=STAGE_LABELS[STAGES[s]][1],
                            round=rnd, rows=rows, archive=archive,
                            voting_open=STATE["voting_open"],
+                           results_visible=results_visible())
+
+
+def leaderboard():
+    """Everyone's votes scored against what the governments actually did."""
+    people = {pid: {"pid": pid, "hits": 0, "scored": 0} for pid in PARTICIPANTS}
+    for rid, votes in STATE["votes"].items():
+        s = STAGE_INDEX[ROUNDS[rid]["stage"]]
+        for pid, choice in votes.items():
+            ident = resolve_identity(PARTICIPANTS[pid], s)
+            answer = HISTORY.get(rid, {}).get(ident["faction"])
+            if answer:
+                people[pid]["scored"] += 1
+                people[pid]["hits"] += choice in answer
+                people[pid]["name"] = faction_display(ident["faction"], s)
+    rows = [p for p in people.values() if p["scored"]]
+    for p in rows:
+        p["pct"] = round(100 * p["hits"] / p["scored"])
+    rows.sort(key=lambda p: (-p["hits"], -p["pct"], p["pid"]))
+    return rows
+
+
+@app.route("/admin/leaderboard")
+@admin_required
+def admin_leaderboard():
+    return render_template("leaderboard.html", rows=leaderboard(),
+                           stage=STATE["stage"], voting_open=STATE["voting_open"],
                            results_visible=results_visible())
 
 

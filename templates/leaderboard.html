@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block bodyclass %}results{% endblock %}
+{% block content %}
+<h1>Leaderboard</h1>
+<table class="leaderboard">
+{% for r in rows %}
+<tr><td>{{ loop.index }}.</td><td>#{{ r.pid }}</td><td>{{ r.hits }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

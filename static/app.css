@@ -63,3 +63,5 @@ body.student-timeline .decision {
   transform: rotate(-0.3deg);
 }
 .qn { font-style: italic; margin-bottom: .4rem; }
+table.leaderboard { font-size: 1.4em; border-collapse: collapse; }
+table.leaderboard th, table.leaderboard td { padding: 0.2em 0.8em; text-align: left; }
