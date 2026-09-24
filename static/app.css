@@ -61,6 +61,16 @@ body.student-timeline .decision {
   max-width: 640px; width: calc(100% - 2em); box-sizing: border-box;
   background: #FDF7F1; z-index: 10;
   transform: rotate(-0.3deg);
+  max-height: 45vh; overflow-y: auto;
+}
+
+/* On phones a pinned box eats the screen: let it sit in the page flow. */
+@media (max-width: 640px), (max-height: 600px) {
+  body.student-timeline .timeline-scroll { padding-bottom: 0; }
+  body.student-timeline .decision {
+    position: static; width: auto; max-height: none; overflow: visible;
+    transform: none;
+  }
 }
 .qn { font-style: italic; margin-bottom: .4rem; }
 table.leaderboard { font-size: 1.4em; border-collapse: collapse; }
